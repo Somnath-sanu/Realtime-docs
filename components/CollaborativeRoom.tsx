@@ -11,6 +11,8 @@ import { Input } from "./ui/input";
 import Image from "next/image";
 import { updateDocument } from "@/lib/actions/room.actions";
 import ShareModal from "./ShareModal";
+import { z } from "zod";
+import { useToast } from "@/components/ui/use-toast";
 
 const CollaborativeRoom = ({
   roomId,
@@ -25,10 +27,22 @@ const CollaborativeRoom = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
 
+  const titleSchema = z.string().min(3).max(20);
+  const { toast } = useToast();
+
   const updateTitleHandler = async (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter") {
+      const { success } = titleSchema.safeParse(documentTitle);
+      if (!success) {
+        toast({
+          title: "Enter a valid title",
+        });
+        setDocumentTitle(roomMetadata.title);
+        return;
+      }
+
       setLoading(true);
 
       try {
@@ -40,15 +54,24 @@ const CollaborativeRoom = ({
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     const handleClickOutside = async (e: MouseEvent) => {
       // console.log(e.target as Node); //DOM element like div , input ...
+
+      const { success } = titleSchema.safeParse(documentTitle);
+      if (!success) {
+        toast({
+          title: "Enter valid title",
+        });
+        setDocumentTitle(roomMetadata.title);
+        return;
+      }
 
       if (
         containerRef.current &&
@@ -118,8 +141,8 @@ const CollaborativeRoom = ({
             </div>
             <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
               <ActiveCollaborators />
-            
-              <ShareModal 
+
+              <ShareModal
                 roomId={roomId}
                 collaborators={users}
                 creatorId={roomMetadata.creatorId}

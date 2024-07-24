@@ -58,8 +58,15 @@ const ShareModal = ({
       const response = await getAllUsers();
 
       const isUserExist = response?.data.filter(
-        (user: any) => user?.emailAddresses[0].emailAddress === email
+        (users: any) =>
+          users?.emailAddresses[0].emailAddress === email &&
+          users?.emailAddresses[0].emailAddress !== user.info.email
       );
+
+      console.log({
+        isUserExist,
+        user,
+      });
 
       if (isUserExist.length > 0) {
         await updateDocumentAccess({
