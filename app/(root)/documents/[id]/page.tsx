@@ -44,6 +44,7 @@ const Document = async ({ params: { id } }: SearchParamProps) => {
       <CollaborativeRoom
         roomId={id}
         roomMetadata={room.metadata}
+        users={usersData}
         currentUserType={currentUserType}
       />
     </main>

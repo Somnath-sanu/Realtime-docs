@@ -64,3 +64,9 @@ export const getDocumentUsers = async ({
     console.log(`Error fetching document users: ${error}`);
   }
 };
+
+
+export const getAllUsers = async () => {
+  const response = await clerkClient.users.getUserList();
+  return parseStringify(response);
+}
